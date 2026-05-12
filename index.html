@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="인테리어 가견적">
+<title>인테리어 가견적 계산기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0e0e;--surface:#1a1a1a;--surface2:#222;--border:#2a2a2a;--border2:#363636;--accent:#c8a04a;--text:#f0ede8;--text2:#9a9490;--text3:#5a5754;--green:#2d6a4f;--green-text:#d8f3dc;--mono:'JetBrains Mono',monospace;--sans:'Noto Sans KR',sans-serif;--r:8px;--rl:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+/* HEADER */
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-0.02em}
+.header-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.header-right{text-align:right;flex-shrink:0}
+.header-date{font-size:10px;color:var(--text3)}
+.header-author{font-size:10px;color:var(--text2);margin-top:2px}
+/* TABS */
+.tab-bar{display:flex;gap:5px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);overflow-x:auto;scrollbar-width:none;position:sticky;top:58px;z-index:40}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:8px 14px;font-size:12px;font-weight:600;font-family:var(--sans);border:1px solid #2d6a4f;border-radius:var(--r);background:#1b4332;color:#74c69d;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab-btn.on{background:#2d6a4f;color:#fff;border-color:#40916c}
+/* CONTENT */
+.content{padding:14px 18px 60px;max-width:540px;margin:0 auto}
+.sec{display:none}.sec.on{display:block}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.card-input{background:rgba(200,160,74,.06);border:1px solid rgba(200,160,74,.5);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.card-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.card-title::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.tag{font-size:10px;background:var(--surface2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border2);margin-left:4px}
+/* INPUTS */
+.inp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inp-wrap{display:flex;flex-direction:column;gap:5px}
+.inp-lbl{font-size:11px;color:var(--text3)}
+.inp-row{display:flex;align-items:center;gap:6px}
+.inp-hint{font-size:10px;color:var(--text3);margin-top:3px;font-style:italic}
+input[type=number]{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;font-size:20px;font-weight:500;font-family:var(--mono);color:var(--text);-moz-appearance:textfield;transition:border-color .15s}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]:focus{outline:none;border-color:var(--accent)}
+.unit{font-size:13px;color:var(--text3);flex-shrink:0}
+/* AREA */
+.area-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.area-box{background:var(--surface2);border-radius:var(--r);padding:8px 12px}
+.area-lbl{font-size:10px;color:var(--text3);margin-bottom:4px}
+.area-main{font-size:17px;font-weight:500;color:var(--text);font-family:var(--mono)}
+.area-ceil{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.info-badge{display:inline-block;background:rgba(200,160,74,.15);border:1px solid rgba(200,160,74,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--accent);margin-top:8px;font-family:var(--mono)}
+/* OPTS */
+.opt3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px}
+.opt2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.opt{padding:9px 4px;font-size:12px;font-family:var(--sans);border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text3);cursor:pointer;text-align:center;line-height:1.4;transition:all .15s}
+.opt.on{background:rgba(200,160,74,.12);color:var(--accent);border-color:var(--accent);font-weight:500}
+.opt-sub{font-size:10px;display:block;margin-top:2px;opacity:.7}
+/* TABLE ROWS */
+.tbl-row{display:flex;justify-content:space-between;align-items:flex-end;padding:7px 0;border-bottom:1px solid var(--border);gap:8px}
+.tbl-row:last-child{border-bottom:none;padding-bottom:0}
+.tbl-lbl{font-size:13px;color:var(--text2);flex-shrink:0}
+.tbl-lbl-sub{font-size:11px;color:var(--text);flex-shrink:0}
+.tbl-right{text-align:right}
+.tbl-hint{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:2px;line-height:1.6;white-space:pre-line}
+.tbl-val{font-size:15px;font-weight:500;color:var(--text)}
+.tbl-accent{font-size:15px;font-weight:600;color:var(--accent);text-align:right}
+.mat-group{padding:10px 0 5px;border-bottom:1px solid var(--border2);margin-bottom:2px}
+.mat-group-name{font-size:13px;font-weight:700;color:var(--accent)}
+.mat-group-size{font-size:11px;color:var(--accent);font-weight:400;margin-left:4px}
+/* RES BOX */
+.res-box{background:var(--surface2);border-radius:var(--r);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px}
+.res-lbl{font-size:12px;color:var(--text2)}
+.res-hint{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px;line-height:1.5;white-space:pre-line}
+.res-num{font-size:28px;font-weight:700;color:var(--accent);font-family:var(--mono);flex-shrink:0;letter-spacing:-0.02em}
+.divider{height:1px;background:var(--border);margin:10px 0}
+/* SUBTABS */
+.sub-tabs{display:flex;gap:6px;margin-bottom:12px}
+.sub-tab{flex:1;padding:7px 4px;font-size:12px;font-weight:500;font-family:var(--sans);border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text3);cursor:pointer;text-align:center;transition:all .15s}
+.sub-tab.on{background:rgba(200,160,74,.1);color:var(--accent);border-color:var(--accent)}
+.sub-sec{display:none}.sub-sec.on{display:block}
+/* BUTTONS */
+.add-btn{width:100%;padding:11px;font-size:13px;font-weight:600;font-family:var(--sans);border:none;border-radius:var(--r);background:var(--green);color:var(--green-text);cursor:pointer;margin-bottom:8px}
+.calc-btn{width:100%;padding:13px;font-size:14px;font-weight:700;font-family:var(--sans);border:none;border-radius:var(--r);background:var(--accent);color:#0e0e0e;cursor:pointer;margin-bottom:12px}
+/* WALL LIST */
+.wall-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:8px}
+.wall-item-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wall-no{font-size:13px;font-weight:700;color:var(--accent)}
+.wall-tp{font-size:10px;background:var(--surface2);color:var(--text3);padding:2px 8px;border-radius:20px;border:1px solid var(--border2);margin-left:6px}
+.del-btn{font-size:11px;color:var(--text3);background:transparent;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--sans)}
+.wall-dims{font-size:16px;font-weight:500;color:var(--text);font-family:var(--mono);margin-bottom:4px}
+.wall-dims-sub{font-size:12px;color:var(--text3);margin-bottom:10px}
+.wall-vals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.wv{background:var(--surface2);border-radius:6px;padding:8px 10px}
+.wv-lbl{font-size:10px;color:var(--text3);margin-bottom:4px}
+.wv-val{font-size:14px;font-weight:500;color:var(--text)}
+/* TOTAL CARD */
+.total-card{background:var(--surface);border:1px solid var(--accent);border-radius:var(--rl);padding:14px 16px;margin-bottom:12px}
+.total-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.total-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ti{background:var(--surface2);border-radius:var(--r);padding:10px 12px}
+.ti-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
+.ti-val{font-size:20px;font-weight:500;color:var(--text)}
+.ti-full{grid-column:1/span 2}
+.empty{text-align:center;font-size:13px;color:var(--text3);padding:24px 0}
+.stitle{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+/* MAT SUM */
+.mat-sum{background:var(--surface);border:1px solid var(--accent);border-radius:var(--rl);padding:14px 16px;margin-top:4px}
+.mat-sum-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.mat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mat-item{background:var(--surface2);border-radius:var(--r);padding:10px}
+.mat-lbl{font-size:10px;color:var(--text3);margin-bottom:4px}
+.mat-val{font-size:17px;font-weight:500;color:var(--text)}
+.mat-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+/* PRICE ROWS */
+.price-row{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:10px}
+.price-row:last-child{border-bottom:none;padding-bottom:0}
+.price-left{flex:1}
+.price-name{font-size:14px;color:var(--text);font-weight:500}
+.price-qty{font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.price-qty-accent{font-size:11px;color:var(--accent);margin-top:2px;font-family:var(--mono)}
+.price-inp-wrap{display:flex;align-items:center;gap:6px}
+.price-inp{width:110px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);padding:7px 10px;font-size:15px;font-weight:500;font-family:var(--mono);color:var(--text);-moz-appearance:textfield;text-align:right}
+.price-inp::-webkit-outer-spin-button,.price-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.price-inp:focus{outline:none;border-color:var(--accent)}
+.price-unit{font-size:11px;color:var(--text3);white-space:nowrap}
+.price-result{font-size:13px;font-weight:500;color:var(--accent);text-align:right;font-family:var(--mono);margin-top:4px}
+/* COST BOXES */
+.cost-box{border-radius:var(--rl);padding:16px 18px;margin-bottom:10px}
+.cb-mat{background:linear-gradient(135deg,rgba(200,160,74,.12),rgba(200,160,74,.04));border:1px solid rgba(200,160,74,.35)}
+.cb-sub{background:linear-gradient(135deg,rgba(91,159,210,.12),rgba(91,159,210,.04));border:1px solid rgba(91,159,210,.35)}
+.cb-door{background:linear-gradient(135deg,rgba(150,120,200,.12),rgba(150,120,200,.04));border:1px solid rgba(150,120,200,.35)}
+.cb-labor{background:linear-gradient(135deg,rgba(76,175,125,.12),rgba(76,175,125,.04));border:1px solid rgba(76,175,125,.35)}
+.cb-lbl{font-size:11px;margin-bottom:6px;letter-spacing:.04em}
+.cb-lbl-mat{color:var(--accent)}
+.cb-lbl-sub{color:#5b9fd2}
+.cb-lbl-door{color:#9678c8}
+.cb-lbl-labor{color:#4caf7d}
+.cb-val{font-size:28px;font-weight:700;font-family:var(--mono);letter-spacing:-0.02em}
+.cb-val-mat{color:var(--accent)}
+.cb-val-sub{color:#5b9fd2}
+.cb-val-door{color:#9678c8}
+.cb-val-labor{color:#4caf7d}
+.cb-hint{font-size:11px;color:var(--text3);margin-top:5px}
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-lbl{font-size:13px;color:var(--text)}
+.toggle-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:24px;cursor:pointer;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+input:checked+.toggle-slider{background:var(--accent)}
+input:checked+.toggle-slider::before{transform:translateX(20px)}
+/* DAY ADJ */
+.day-adj{display:flex;align-items:center;gap:8px}
+.day-btn{width:36px;height:36px;border:1px solid var(--border2);border-radius:var(--r);background:var(--surface2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--sans);transition:all .15s;flex-shrink:0}
+.day-btn:hover{border-color:var(--accent);color:var(--accent)}
+.day-val{font-size:22px;font-weight:700;color:var(--text);font-family:var(--mono);min-width:36px;text-align:center}
+.day-base{font-size:10px;color:var(--text3);margin-top:2px;text-align:center}
+.range-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+.range-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;text-align:center;font-size:10px;color:var(--text3);line-height:1.5;transition:all .15s}
+.range-chip.active{background:rgba(200,160,74,.12);border-color:rgba(200,160,74,.4);color:var(--accent);font-weight:600}
+.area-badge{display:flex;align-items:center;background:rgba(200,160,74,.1);border:1px solid rgba(200,160,74,.25);border-radius:var(--r);padding:8px 12px;margin-bottom:12px}
+.area-badge-lbl{font-size:11px;color:var(--text2)}
+.area-badge-val{font-size:16px;font-weight:600;color:var(--accent);font-family:var(--mono);margin-left:auto}
+.notice-box{background:var(--surface2);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:10px}
+.sec-hd{font-size:14px;font-weight:700;color:var(--text);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-box">🏠</div>
+    <div>
+      <div class="logo-text">인테리어 가견적 계산기</div>
+      <div class="header-sub">자재 소요량, 비용 계산</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="mod-date">최종수정일: —</div>
+    <div class="header-author">HJ Tama Park</div>
+  </div>
+</div>
+
+<!-- 현장 관리 바 -->
+<div style="background:#111;border-bottom:1px solid #2a2a2a;padding:8px 14px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none">
+  <select id="site_select" onchange="loadSite()" style="flex:1;min-width:0;background:#1a1a1a;border:1px solid #363636;border-radius:6px;padding:7px 10px;font-size:12px;color:#f0ede8;font-family:var(--sans);cursor:pointer">
+    <option value="">📋 현장 선택...</option>
+  </select>
+  <button onclick="saveSite()" style="flex-shrink:0;padding:7px 12px;font-size:12px;font-weight:600;font-family:var(--sans);border:none;border-radius:6px;background:var(--accent);color:#0e0e0e;cursor:pointer;white-space:nowrap">💾 저장</button>
+  <button onclick="newSite()" style="flex-shrink:0;padding:7px 12px;font-size:12px;font-weight:600;font-family:var(--sans);border:1px solid #363636;border-radius:6px;background:transparent;color:#9a9490;cursor:pointer;white-space:nowrap">＋ 새 현장</button>
+  <button onclick="deleteSite()" style="flex-shrink:0;padding:7px 10px;font-size:12px;font-family:var(--sans);border:1px solid #363636;border-radius:6px;background:transparent;color:#5a5754;cursor:pointer">🗑</button>
+</div>
+<!-- 현장명 입력 -->
+<div id="site_name_bar" style="display:none;background:#111;border-bottom:1px solid #2a2a2a;padding:8px 14px">
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:11px;color:#9a9490;flex-shrink:0">현장명</span>
+    <input id="site_name" type="text" placeholder="예) 연남동 OO카페" style="flex:1;background:#1a1a1a;border:1px solid rgba(200,160,74,.4);border-radius:6px;padding:7px 10px;font-size:12px;color:#f0ede8;font-family:var(--sans)">
+    <button onclick="confirmSave()" style="flex-shrink:0;padding:7px 12px;font-size:12px;font-weight:700;font-family:var(--sans);border:none;border-radius:6px;background:var(--accent);color:#0e0e0e;cursor:pointer">확인</button>
+    <button onclick="cancelSave()" style="flex-shrink:0;padding:7px 10px;font-size:12px;font-family:var(--sans);border:1px solid #363636;border-radius:6px;background:transparent;color:#5a5754;cursor:pointer">취소</button>
+  </div>
+  <div style="font-size:10px;color:#5a5754;margin-top:6px;line-height:1.5">* 현장별 데이터 저장/불러오기는 현재 사용중인 브라우저 내에서만 가능합니다.</div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="showTab('wall',this)">목공 · 벽체</button>
+  <button class="tab-btn" onclick="showTab('ceiling',this)">목공 · 천장</button>
+  <button class="tab-btn" onclick="showTab('cost',this)">목공 가견적</button>
+</div>
+
+<div class="content">
+
+<!-- ===== 벽체 탭 ===== -->
+<div id="sec-wall" class="sec on">
+  <div class="card card-input">
+    <div class="card-title">벽면 크기</div>
+    <div class="inp-grid">
+      <div class="inp-wrap"><div class="inp-lbl">가로 폭</div><div class="inp-row"><input type="number" id="w_w" value="12000" inputmode="numeric" oninput="calcWall()"><span class="unit">mm</span></div></div>
+      <div class="inp-wrap"><div class="inp-lbl">세로 높이</div><div class="inp-row"><input type="number" id="w_h" value="2700" inputmode="numeric" oninput="calcWall()"><span class="unit">mm</span></div><div class="inp-hint" id="ch_hint">* 2700mm 이하</div></div>
+    </div>
+    <div class="area-row">
+      <div class="area-box">
+        <div class="area-lbl">벽면 면적</div>
+        <div class="area-main" id="w_sqm">—</div>
+        <div class="area-ceil" id="w_py_small">—</div>
+      </div>
+      <div class="area-box">
+        <div class="area-lbl" id="w_constr_lbl">시공 면적</div>
+        <div class="area-main" style="color:var(--accent)" id="w_constr_sqm">—</div>
+        <div class="area-ceil" style="color:var(--accent)" id="w_constr_py">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="card card-input">
+    <div class="card-title">시공 종류</div>
+    <div class="opt3">
+      <button class="opt" id="tp_1p" onclick="setType('1p')">벽체 1P<span class="opt-sub">골조 없음</span></button>
+      <button class="opt on" id="tp_2p" onclick="setType('2p')">벽체 2P</button>
+      <button class="opt" id="tp_4p" onclick="setType('4p')">가벽 2P+2P<span class="opt-sub">양면</span></button>
+    </div>
+  </div>
+  <div class="card" id="kakjae_card">
+    <div class="card-title">각재 소요량 <span id="kakjae_label" class="tag">다루끼</span></div>
+    <div class="tbl-row"><span class="tbl-lbl">세로상</span><div class="tbl-right"><div class="tbl-hint" id="kk_fv"></div><div class="tbl-val" id="kk_vbar"></div></div></div>
+    <div class="tbl-row"><span class="tbl-lbl">가로상</span><div class="tbl-right"><div class="tbl-hint" id="kk_fh"></div><div class="tbl-val" id="kk_hbar"></div></div></div>
+    <div class="tbl-row"><span class="tbl-lbl">총 까치</span><div class="tbl-right"><div class="tbl-hint" id="kk_total_hint"></div><div class="tbl-val" id="kk_total"></div></div></div>
+    <div class="res-box"><div><div class="res-lbl" id="kk_dan_lbl">필요 단수</div><div class="res-hint" id="kk_fdan"></div></div><div class="res-num" id="kk_dan">—</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">석고보드 소요량</div>
+    <div class="tbl-row"><span class="tbl-lbl">1F + 2F</span><div class="tbl-right"><div class="tbl-hint" id="gb_f1f2f"></div><div class="tbl-val" id="gb_sum"></div></div></div>
+    <div class="res-box"><div><div class="res-lbl">PLY 최종 수량</div><div class="res-hint" id="gb_fply"></div></div><div class="res-num" id="gb_ply">—</div></div>
+    <div id="w_area_note" style="display:none;margin-top:10px"></div>
+  </div>
+  <button class="add-btn" onclick="addWall()">＋ 이 벽체를 목록에 추가</button>
+  <div style="font-size:11px;color:#e07b39;margin:-4px 0 10px;line-height:1.6">* 계산할 모든 벽체를 추가 후 아래의 '총 소요량 계산' 버튼을 꼭 눌러주세요.</div>
+  <button class="calc-btn" onclick="calcWallTotal()">총 소요량 계산</button>
+  <div class="total-card" id="wall_total_card" style="display:none">
+    <div class="total-title">벽체 합계</div>
+    <div class="total-grid">
+      <div class="ti ti-full"><div class="ti-lbl">총 면적 (벽면)</div><div class="ti-val" id="sum_area">—</div></div>
+      <div class="ti ti-full" style="background:rgba(200,160,74,.1);border:1px solid rgba(200,160,74,.25)"><div class="ti-lbl" style="color:var(--accent)">총 시공면적</div><div class="ti-val" style="color:var(--accent)" id="sum_constr_area">—</div></div>
+      <div class="ti"><div class="ti-lbl">다루끼 (까치)</div><div class="ti-val" id="sum_dk">—</div></div>
+      <div class="ti"><div class="ti-lbl">다루끼 (단수)</div><div class="ti-val" id="sum_dd">—</div></div>
+      <div class="ti"><div class="ti-lbl">투바이 (까치)</div><div class="ti-val" id="sum_tk">—</div></div>
+      <div class="ti"><div class="ti-lbl">투바이 (단수)</div><div class="ti-val" id="sum_td">—</div></div>
+      <div class="ti ti-full"><div class="ti-lbl">석고보드</div><div class="ti-val" id="sum_gb">—</div></div>
+    </div>
+  </div>
+  <div class="stitle">추가된 벽체 <span id="wall_count" class="tag">0개</span></div>
+  <div id="wall_list"><div class="empty">추가된 벽체가 없어요</div></div>
+</div>
+
+<!-- ===== 천장 탭 ===== -->
+<div id="sec-ceiling" class="sec">
+  <div class="card card-input">
+    <div class="card-title">천장 면적 · 단내림</div>
+    <div class="inp-grid">
+      <div class="inp-wrap"><div class="inp-lbl">가로 (긴 면)</div><div class="inp-row"><input type="number" id="c_long" value="18000" inputmode="numeric" oninput="calcCeiling()"><span class="unit">mm</span></div></div>
+      <div class="inp-wrap"><div class="inp-lbl">세로 (짧은 면)</div><div class="inp-row"><input type="number" id="c_short" value="15000" inputmode="numeric" oninput="calcCeiling()"><span class="unit">mm</span></div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+      <div class="inp-lbl" style="flex-shrink:0">단내림 높이</div>
+      <div class="inp-row" style="flex:1"><input type="number" id="d_height" value="450" inputmode="numeric" oninput="calcCeiling()" style="max-width:120px;font-size:16px"><span class="unit">mm</span></div>
+    </div>
+    <div class="area-row">
+      <div class="area-box">
+        <div class="area-lbl">천장 면적</div>
+        <div class="area-main" id="c_sqm">—</div>
+        <div class="area-ceil" id="c_py_small">—</div>
+      </div>
+      <div class="area-box">
+        <div class="area-lbl" id="c_constr_lbl">시공 면적</div>
+        <div class="area-main" style="color:var(--accent)" id="c_constr_sqm">—</div>
+        <div class="area-ceil" id="c_constr_py">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab on" onclick="showSubTab('dorans',this)">도란스</button>
+    <button class="sub-tab" onclick="showSubTab('gbsang',this)">석고보드상</button>
+    <button class="sub-tab" onclick="showSubTab('gb',this)">석고보드</button>
+  </div>
+  <div style="font-size:11px;color:#e07b39;margin:-4px 0 10px;line-height:1.6">* 천장 덧방 시공시에는 석고보드 탭에서 '시공방식 &gt; 1PLY(덧방)'을 선택해 주세요.</div>
+  <button class="calc-btn" onclick="calcCeiling();showCeilTotal()">총 소요량 계산</button>
+  <div id="ceil_total_card" style="display:none;background:var(--surface);border:1px solid var(--accent);border-radius:var(--rl);padding:14px 16px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px">천장 자재 소요량 합계</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="background:var(--surface2);border-radius:var(--r);padding:10px 12px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">다루끼</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px" id="ct_dk_formula">—</div>
+        <div style="display:flex;gap:12px">
+          <span style="font-size:20px;font-weight:500;color:var(--text)" id="ct_dk_kachi">—</span>
+          <span style="font-size:13px;color:var(--accent);font-weight:600;align-self:flex-end" id="ct_dk_dan">—</span>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--r);padding:10px 12px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">합판 5T</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px" id="ct_ply_formula">—</div>
+        <div style="font-size:20px;font-weight:500;color:var(--text)" id="ct_ply">—</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--r);padding:10px 12px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">석고보드</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px" id="ct_gb_formula">—</div>
+        <div style="font-size:20px;font-weight:500;color:var(--text)" id="ct_gb">—</div>
+      </div>
+    </div>
+  </div>
+  <div id="sub-dorans" class="sub-sec on">
+    <div id="dorans_content">
+
+      <div class="card">
+        <div class="card-title">도란스 기본 정보</div>
+        <div class="tbl-row"><span class="tbl-lbl">도란스 수량</span><div class="tbl-right"><div class="tbl-hint" id="d_fcount"></div><div class="tbl-val" id="d_count"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">1개당 세로상</span><div class="tbl-right"><div class="tbl-hint" id="d_fvbar"></div><div class="tbl-val" id="d_vbar"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">1개당 가로상</span><div class="tbl-right"><div class="tbl-hint" id="d_fhbar"></div><div class="tbl-val" id="d_hbar"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">다루끼 소요량</div>
+        <div class="tbl-row"><span class="tbl-lbl">전체 가로상</span><div class="tbl-right"><div class="tbl-hint" id="d_fhbar_total"></div><div class="tbl-val" id="d_hbar_total"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">전체 세로상</span><div class="tbl-right"><div class="tbl-hint" id="d_fvbar_total"></div><div class="tbl-val" id="d_vbar_total"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">총 까치</span><div class="tbl-right"><div class="tbl-hint" id="d_kachi_hint"></div><div class="tbl-val" id="d_kachi_total"></div></div></div>
+        <div class="res-box"><div><div class="res-lbl">다루끼 필요 단수</div><div class="res-hint" id="d_fdan"></div></div><div class="res-num" id="d_dan">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">합판 소요량 <span class="tag">5T</span></div>
+        <div class="tbl-row"><span class="tbl-lbl">합판 원장 분할 수량</span><div class="tbl-right"><div class="tbl-hint" id="d_fsplit"></div><div class="tbl-val" id="d_split"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">도란스 개당 합판 소요량</span><div class="tbl-right"><div class="tbl-hint" id="d_fply1"></div><div class="tbl-val" id="d_ply1"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">총 소요량</span><div class="tbl-right"><div class="tbl-hint" id="d_fply_raw"></div><div class="tbl-val" id="d_ply_raw"></div></div></div>
+        <div class="res-box"><div><div class="res-lbl">합판 최종 수량</div><div class="res-hint" id="d_fply_total"></div></div><div class="res-num" id="d_ply_total">—</div></div>
+      </div>
+    </div>
+    <div id="dorans_skip" style="display:none">
+      <div class="card" style="border-color:rgba(200,160,74,.3)">
+        <div style="font-size:13px;color:var(--accent);font-weight:500;margin-bottom:4px">⚠ 도란스 시공 불필요</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.6">1PLY(덧방) 선택 시 도란스 시공이 필요 없어 다루끼·합판은 소요량에서 제외됩니다.</div>
+      </div>
+    </div>
+  </div>
+  <div id="sub-gbsang" class="sub-sec">
+    <div class="card">
+      <div class="card-title">석고보드상 (다루끼) 소요량</div>
+      <div id="gbsang_content">
+        <div class="tbl-row"><span class="tbl-lbl">세로 방향</span><div class="tbl-right"><div class="tbl-hint" id="gs_fv"></div><div class="tbl-val" id="gs_v"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">가로 방향</span><div class="tbl-right"><div class="tbl-hint" id="gs_fh"></div><div class="tbl-val" id="gs_h"></div></div></div>
+        <div class="tbl-row"><span class="tbl-lbl">총 까치</span><div class="tbl-right"><div class="tbl-hint" id="gs_total_hint"></div><div class="tbl-val" id="gs_total"></div></div></div>
+        <div class="res-box"><div><div class="res-lbl">다루끼 필요 단수</div><div class="res-hint" id="gs_fdan"></div></div><div class="res-num" id="gs_dan">—</div></div>
+      </div>
+      <div id="gbsang_skip" style="display:none"><div style="font-size:13px;color:var(--accent);font-weight:500;margin-bottom:4px">⚠ 석고보드상 불필요</div><div style="font-size:12px;color:var(--text3)">1PLY(덧방) 선택 시 불필요합니다.</div></div>
+    </div>
+  </div>
+  <div id="sub-gb" class="sub-sec">
+    <div class="card">
+      <div class="card-title">천장 석고보드 소요량</div>
+      <div class="inp-lbl" style="margin-bottom:4px">시공 방식</div>
+      <div class="opt2">
+        <button class="opt on" id="gb_2ply" onclick="setGbPly(2)">2PLY<span class="opt-sub">일반 신규 천장</span></button>
+        <button class="opt" id="gb_1ply" onclick="setGbPly(1)">1PLY<span class="opt-sub">기존 천장 덧방</span></button>
+      </div>
+      <div style="height:12px"></div>
+      <div class="tbl-row"><span class="tbl-lbl">짧은 면 방향</span><div class="tbl-right"><div class="tbl-hint" id="cg_fshort"></div><div class="tbl-val" id="cg_short"></div></div></div>
+      <div class="tbl-row"><span class="tbl-lbl">긴 면 방향</span><div class="tbl-right"><div class="tbl-hint" id="cg_flong"></div><div class="tbl-val" id="cg_long"></div></div></div>
+      <div class="res-box"><div><div class="res-lbl">석고보드 수량 <span id="gb_ply_tag" class="tag">2PLY</span></div><div class="res-hint" id="cg_ftotal"></div></div><div class="res-num" id="cg_total">—</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== 목공 가견적 탭 ===== -->
+<div id="sec-cost" class="sec">
+  <div style="background:rgba(200,160,74,.15);border:1px solid rgba(200,160,74,.5);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--accent);font-weight:500;line-height:1.7;margin-bottom:10px">⚠️ 벽체·천장 탭에서 수량을 먼저 계산한 후 단가를 입력하세요.</div>
+
+  <!-- 1. 소요량 합계 표 -->
+  <div class="card">
+    <div class="card-title">목공 자재 소요량 합계</div>
+    <div style="overflow-x:auto">
+      <table id="soyo_table" style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead id="soyo_thead">
+          <tr>
+            <th style="text-align:left;padding:6px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border2);white-space:nowrap">자재</th>
+            <th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2);white-space:nowrap">천장</th>
+          </tr>
+        </thead>
+        <tbody id="soyo_tbody">
+          <tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">다루끼</td><td style="text-align:right;padding:7px 4px;color:var(--text);border-bottom:1px solid var(--border)" id="st_ceil_dk">—</td></tr>
+          <tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">투바이</td><td style="text-align:right;padding:7px 4px;color:var(--text);border-bottom:1px solid var(--border)" id="st_ceil_tb">—</td></tr>
+          <tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">합판 5T</td><td style="text-align:right;padding:7px 4px;color:var(--text);border-bottom:1px solid var(--border)" id="st_ceil_ply">—</td></tr>
+          <tr><td style="padding:7px 4px;color:var(--accent);font-weight:600">석고보드</td><td style="text-align:right;padding:7px 4px;color:var(--text)" id="st_ceil_gb">—</td></tr>
+        </tbody>
+
+      </table>
+    </div>
+    <!-- hidden compat ids -->
+    <div style="display:none">
+      <span id="c_wall_dk_hint"></span><span id="c_wall_dk"></span>
+      <span id="c_ceil_dk_hint"></span><span id="c_ceil_dk"></span>
+      <span id="c_dk_sum_hint"></span><span id="c_dk_sum"></span>
+      <span id="c_wall_tb_hint"></span><span id="c_wall_tb"></span>
+      <span id="c_ply_lbl"></span><span id="c_ceil_ply"></span>
+      <span id="c_wall_gb_hint"></span><span id="c_wall_gb"></span>
+      <span id="c_ceil_gb_lbl"></span><span id="c_ceil_gb_hint"></span><span id="c_ceil_gb"></span>
+      <span id="c_gb_sum_hint"></span><span id="c_gb_sum"></span>
+    </div>
+  </div>
+
+  <!-- 2. 단가 입력 -->
+  <div class="card card-input">
+    <div class="card-title">자재 단가 입력</div>
+    <div class="price-row">
+      <div class="price-left"><div class="price-name">다루끼</div><div class="price-qty" id="pq_dk_kachi">전체 — 까치</div><div class="price-qty-accent" id="pq_dk">→ — 단</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="price-inp-wrap"><input class="price-inp" type="number" id="pu_dk" value="38000" min="0" inputmode="numeric" oninput="calcCost()" style="width:80px;font-size:13px;padding:6px 8px"><span class="price-unit">원/단</span></div>
+        <div class="price-result" id="pr_dk" style="font-size:18px;font-weight:700">—</div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-left"><div class="price-name">투바이</div><div class="price-qty" id="pq_tb_kachi">전체 — 까치</div><div class="price-qty-accent" id="pq_tb">→ — 단</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="price-inp-wrap"><input class="price-inp" type="number" id="pu_tb" value="35000" min="0" inputmode="numeric" oninput="calcCost()" style="width:80px;font-size:13px;padding:6px 8px"><span class="price-unit">원/단</span></div>
+        <div class="price-result" id="pr_tb" style="font-size:18px;font-weight:700">—</div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-left"><div class="price-name">합판 5T</div><div class="price-qty" id="pq_ply">— 장</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="price-inp-wrap"><input class="price-inp" type="number" id="pu_ply" value="7800" min="0" inputmode="numeric" oninput="calcCost()" style="width:80px;font-size:13px;padding:6px 8px"><span class="price-unit">원/장</span></div>
+        <div class="price-result" id="pr_ply" style="font-size:18px;font-weight:700">—</div>
+      </div>
+    </div>
+    <div class="price-row">
+      <div class="price-left"><div class="price-name">석고보드</div><div class="price-qty" id="pq_gb">— 장</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="price-inp-wrap"><input class="price-inp" type="number" id="pu_gb" value="3800" min="0" inputmode="numeric" oninput="calcCost()" style="width:80px;font-size:13px;padding:6px 8px"><span class="price-unit">원/장</span></div>
+        <div class="price-result" id="pr_gb" style="font-size:18px;font-weight:700">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 목공 자재비 합계 -->
+  <div class="cost-box cb-mat"><div class="cb-lbl cb-lbl-mat">목공 자재비 합계</div><div class="cb-val cb-val-mat" id="cost_total">0 원</div><div class="cb-hint" id="cost_breakdown">단가를 입력하면 자동 계산됩니다</div></div>
+
+  <!-- 4. 문 설치 자재비 -->
+  <div class="cost-box cb-door" style="background:rgba(200,160,74,.06);border:1px solid rgba(200,160,74,.5)">
+    <div class="cb-lbl cb-lbl-door">문 설치 자재비</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="day-btn" onclick="adjDoorMat(-1)">−</button>
+        <div style="text-align:center"><div class="day-val" id="door_mat_cnt">0</div><div class="day-base">문 개수</div></div>
+        <button class="day-btn" onclick="adjDoorMat(+1)">＋</button>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">개당 300,000원</div>
+        <div class="cb-val cb-val-door" id="door_mat_total" style="font-size:22px">0 원</div>
+      </div>
+    </div>
+    <div class="cb-hint" id="door_mat_hint">문 수량을 추가하면 자동 계산됩니다</div>
+  </div>
+
+  <!-- 5. 목공 부자재비 -->
+  <div class="cost-box cb-sub"><div class="cb-lbl cb-lbl-sub">목공 부자재비 합계<span style="font-size:10px;font-weight:400;margin-left:8px;opacity:.7">천장면적 기준 · 평당 15,000원</span></div><div class="cb-val cb-val-sub" id="sub_cost_total">0 원</div><div class="cb-hint" id="sub_cost_hint">천장 면적을 먼저 입력하세요</div></div>
+
+  <div style="height:24px"></div>
+
+  <!-- 6. 목공 인건비 -->
+  <div class="sec-hd">👷 목공 인건비</div>
+  <div class="card card-input">
+    <div class="card-title">총 시공 면적</div>
+    <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;line-height:1.8" id="labor_area_detail">—</div>
+    <div style="background:rgba(200,160,74,.12);border:1px solid rgba(200,160,74,.35);border-radius:var(--r);padding:12px 16px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;color:var(--accent);margin-bottom:4px">합계 시공면적</div>
+          <div style="font-size:28px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="labor_area_disp">—</div>
+        </div>
+        <button onclick="recalcLaborArea()" style="flex-shrink:0;padding:8px 14px;font-size:12px;font-weight:600;font-family:var(--sans);border:1px solid var(--accent);border-radius:var(--r);background:rgba(200,160,74,.15);color:var(--accent);cursor:pointer">🔄 새로고침</button>
+      </div>
+      <div style="border-top:1px solid rgba(200,160,74,.25);padding-top:10px">
+        <div style="font-size:11px;color:var(--accent);margin-bottom:6px">직접 입력 <span style="color:var(--text3);font-size:10px">(필요시)</span></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="labor_area" value="" inputmode="numeric" oninput="calcLabor()" placeholder="자동계산" style="flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(200,160,74,.3);border-radius:var(--r);padding:8px 10px;font-size:18px;font-weight:500;font-family:var(--mono);color:var(--text);-moz-appearance:textfield">
+          <span style="font-size:13px;color:var(--text3)">㎡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card-input">
+    <div class="card-title">면적 기준 작업일수</div>
+    <div class="range-grid">
+      <div class="range-chip" id="r1">50–70㎡<br>3일</div>
+      <div class="range-chip" id="r2">70–100㎡<br>4일</div>
+      <div class="range-chip" id="r3">100–150㎡<br>5일</div>
+      <div class="range-chip" id="r4">150–200㎡<br>6일</div>
+      <div class="range-chip" id="r5">200–250㎡<br>7일</div>
+      <div class="range-chip" id="r6">기타<br>직접조정</div>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div class="tbl-lbl">작업일수 조정</div><div class="day-base" id="base_day_lbl" style="text-align:left;margin-top:3px">면적 기준</div></div>
+      <div class="day-adj">
+        <button class="day-btn" onclick="adjDay(-1)">−</button>
+        <div><div class="day-val" id="day_disp">4</div><div class="day-base">일</div></div>
+        <button class="day-btn" onclick="adjDay(+1)">＋</button>
+      </div>
+    </div>
+  </div>
+  <div class="card card-input">
+    <div class="card-title">목수 인건비 (일당)</div>
+    <!-- 대장 목수 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <label class="toggle"><input type="checkbox" id="chief_toggle" checked onchange="calcLabor()"><span class="toggle-slider"></span></label>
+        <span style="font-size:13px;color:var(--text)">대장 목수</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="number" id="chief_rate" value="400000" inputmode="numeric" oninput="calcLabor()" style="width:100px;font-size:14px;padding:6px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);-moz-appearance:textfield;font-family:var(--mono)">
+        <span style="font-size:11px;color:var(--text3)">원/일</span>
+      </div>
+    </div>
+    <!-- 보조 목수 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <label class="toggle"><input type="checkbox" id="assist_toggle" checked onchange="calcLabor()"><span class="toggle-slider"></span></label>
+        <span style="font-size:13px;color:var(--text)" id="assist_sub_lbl">보조 목수</span>
+      </div>
+      <div id="assist_inp" style="display:flex;align-items:center;gap:6px">
+        <input type="number" id="assist_rate" value="300000" inputmode="numeric" oninput="calcLabor()" style="width:100px;font-size:14px;padding:6px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);-moz-appearance:textfield;font-family:var(--mono)">
+        <span style="font-size:11px;color:var(--text3)">원/일</span>
+      </div>
+    </div>
+  </div>
+  <div class="card card-input">
+    <div class="card-title">문 설치 인건비</div>
+    <div class="toggle-row" style="margin-bottom:10px"><div><div class="toggle-lbl">문 설치 포함</div><div class="toggle-sub" id="door_sub">제외됨</div></div><label class="toggle"><input type="checkbox" id="door_toggle" onchange="onDoorToggle()"><span class="toggle-slider"></span></label></div>
+    <div id="door_inp" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px">
+        <div style="text-align:center">
+          <div class="day-val" id="door_labor_cnt_disp">2</div>
+          <div class="day-base">문 개수</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">문2개당 1품</div>
+          <div class="cb-val cb-val-door" id="door_labor_total" style="font-size:22px">0 원</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--border)">
+        <span style="font-size:11px;color:var(--text3)">1품 단가 직접 입력</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" id="door_rate" value="400000" inputmode="numeric" oninput="calcLabor()" style="width:100px;font-size:14px;padding:6px 8px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);-moz-appearance:textfield;font-family:var(--mono)">
+          <span style="font-size:11px;color:var(--text3)">원</span>
+        </div>
+      </div>
+      <div style="display:none"><span id="door_labor_cnt">2</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">인건비 계산 내역</div>
+    <div class="tbl-row"><span class="tbl-lbl">총 작업일수</span><span class="tbl-accent" id="res_days">4 일</span></div>
+    <div class="tbl-row"><span class="tbl-lbl">대장목수</span><div style="text-align:right"><div class="tbl-val" id="res_chief">—</div><div class="tbl-hint" id="res_chief_hint"></div></div></div>
+    <div class="tbl-row" id="res_assist_row"><span class="tbl-lbl">보조목수</span><div style="text-align:right"><div class="tbl-val" id="res_assist">—</div><div class="tbl-hint" id="res_assist_hint"></div></div></div>
+    <div class="tbl-row" id="res_door_row" style="display:none"><span class="tbl-lbl">문 설치 인건비</span><div style="text-align:right"><div class="tbl-val" id="res_door">—</div></div></div>
+  </div>
+  <div class="cost-box cb-labor"><div class="cb-lbl cb-lbl-labor">목공 인건비 합계</div><div class="cb-val cb-val-labor" id="labor_total">0 원</div><div class="cb-hint" id="labor_hint">면적과 일당을 입력하면 자동 계산됩니다</div></div>
+  <button onclick="recalcAll()" style="width:100%;padding:14px;font-size:15px;font-weight:700;font-family:var(--sans);border:none;border-radius:var(--rl);background:var(--accent);color:#0e0e0e;cursor:pointer;margin-bottom:10px;letter-spacing:.02em">🧮 총 가견적 계산</button>
+
+  <div style="height:10px"></div>
+
+  <!-- 7. 최종 합계 -->
+  <div style="background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.15);border-radius:var(--rl);padding:18px;margin-bottom:10px">
+    <div style="font-size:14px;color:#fff;letter-spacing:.02em;margin-bottom:14px;font-weight:700">🧾 목공 가견적 최종합계</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07)">
+      <span style="font-size:12px;color:var(--text2)">목공 자재비</span>
+      <span style="font-size:14px;font-weight:500;color:var(--accent);font-family:var(--mono)" id="grand_mat">0 원</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07)">
+      <span style="font-size:12px;color:var(--text2)">목공 인건비</span>
+      <span style="font-size:14px;font-weight:500;color:#4caf7d;font-family:var(--mono)" id="grand_labor">0 원</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07)">
+      <span style="font-size:12px;color:var(--text2)">문 설치 자재비</span>
+      <span style="font-size:14px;font-weight:500;color:#9678c8;font-family:var(--mono)" id="grand_door">0 원</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:12px">
+      <span style="font-size:12px;color:var(--text2)">목공 부자재비</span>
+      <span style="font-size:14px;font-weight:500;color:#5b9fd2;font-family:var(--mono)" id="grand_sub">0 원</span>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">총 합계</div>
+      <div style="font-size:34px;font-weight:700;color:#fff;font-family:var(--mono);letter-spacing:-0.02em" id="grand_total">0 원</div>
+    </div>
+  </div>
+
+  <button onclick="exportExcel()" style="width:100%;padding:14px;font-size:14px;font-weight:700;font-family:var(--sans);border:none;border-radius:var(--rl);background:#1d6f42;color:#fff;cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px">
+    <span>📊</span> 엑셀로 내보내기
+  </button>
+
+</div>
+
+</div><!-- content end -->
+
+<script>
+// 날짜
+const today=new Date();
+document.getElementById('mod-date').textContent='최종수정일: '+today.getFullYear()+'.'+String(today.getMonth()+1).padStart(2,'0')+'.'+String(today.getDate()).padStart(2,'0');
+
+// 상태
+let tpMode='2p',wallList=[],idSeq=0;
+let ceilDK=0,ceilDKkachi=0,ceilPly=0,ceilGB=0,ceilPy=0,ceilSqm=0;
+let wallDK=0,wallDKkachi=0,wallTB=0,wallTBkachi=0,wallGB=0;
+let gbPly=2,cgShortVal=0,cgLongVal=0;
+let baseDays=4,adjDays=0,doorLaborCnt=2,doorMatCnt=0;
+
+
+// ════════════════════════════════
+//  현장 저장 / 불러오기
+// ════════════════════════════════
+const STORAGE_KEY='interior_sites';
+
+function getSites(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}
+  catch(e){return{};}
+}
+function setSites(obj){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(obj));
+}
+
+function refreshSiteSelect(selectName){
+  const sel=document.getElementById('site_select');
+  const sites=getSites();
+  const keys=Object.keys(sites);
+  sel.innerHTML='<option value="">📋 현장 선택...</option>';
+  keys.forEach(k=>{
+    const opt=document.createElement('option');
+    opt.value=k;opt.textContent=k;
+    if(k===selectName)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function collectState(){
+  return{
+    // 벽체
+    w_w:document.getElementById('w_w').value,
+    w_h:document.getElementById('w_h').value,
+    tpMode,
+    wallList:JSON.parse(JSON.stringify(wallList)),
+    wallDK,wallDKkachi,wallTB,wallTBkachi,wallGB,
+    // 천장
+    c_long:document.getElementById('c_long').value,
+    c_short:document.getElementById('c_short').value,
+    d_height:document.getElementById('d_height').value,
+    gbPly,ceilDK,ceilDKkachi,ceilPly,ceilGB,ceilSqm,ceilPy,
+    cgShortVal,cgLongVal,
+    // 가견적 단가
+    pu_dk:document.getElementById('pu_dk').value,
+    pu_tb:document.getElementById('pu_tb').value,
+    pu_ply:document.getElementById('pu_ply').value,
+    pu_gb:document.getElementById('pu_gb').value,
+    // 인건비
+    chief_toggle:document.getElementById('chief_toggle')?.checked??true,
+    chief_rate:document.getElementById('chief_rate').value,
+    assist_toggle:document.getElementById('assist_toggle').checked,
+    assist_rate:document.getElementById('assist_rate').value,
+    labor_area:document.getElementById('labor_area').value,
+    baseDays,adjDays,
+    // 문
+    door_toggle:document.getElementById('door_toggle').checked,
+    door_rate:document.getElementById('door_rate').value,
+    doorMatCnt,doorLaborCnt,
+  };
+}
+
+function applyState(s){
+  // 벽체 입력
+  document.getElementById('w_w').value=s.w_w||'';
+  document.getElementById('w_h').value=s.w_h||'';
+  tpMode=s.tpMode||'2p';
+  ['1p','2p','4p'].forEach(t=>document.getElementById('tp_'+t).classList.remove('on'));
+  document.getElementById('tp_'+tpMode).classList.add('on');
+  wallList=s.wallList||[];
+  wallDK=s.wallDK||0;wallDKkachi=s.wallDKkachi||0;
+  wallTB=s.wallTB||0;wallTBkachi=s.wallTBkachi||0;wallGB=s.wallGB||0;
+  // 천장
+  document.getElementById('c_long').value=s.c_long||'';
+  document.getElementById('c_short').value=s.c_short||'';
+  document.getElementById('d_height').value=s.d_height||'450';
+  gbPly=s.gbPly||2;
+  document.getElementById('gb_2ply').classList.toggle('on',gbPly===2);
+  document.getElementById('gb_1ply').classList.toggle('on',gbPly===1);
+  ceilDK=s.ceilDK||0;ceilDKkachi=s.ceilDKkachi||0;
+  ceilPly=s.ceilPly||0;ceilGB=s.ceilGB||0;
+  ceilSqm=s.ceilSqm||0;ceilPy=s.ceilPy||0;
+  cgShortVal=s.cgShortVal||0;cgLongVal=s.cgLongVal||0;
+  // 단가
+  document.getElementById('pu_dk').value=s.pu_dk||'38000';
+  document.getElementById('pu_tb').value=s.pu_tb||'35000';
+  document.getElementById('pu_ply').value=s.pu_ply||'7800';
+  document.getElementById('pu_gb').value=s.pu_gb||'3800';
+  // 인건비
+  if(document.getElementById('chief_toggle'))document.getElementById('chief_toggle').checked=s.chief_toggle??true;
+  document.getElementById('chief_rate').value=s.chief_rate||'400000';
+  document.getElementById('assist_toggle').checked=s.assist_toggle??true;
+  document.getElementById('assist_rate').value=s.assist_rate||'300000';
+  document.getElementById('labor_area').value=s.labor_area||'';
+  baseDays=s.baseDays||4;adjDays=s.adjDays||0;
+  // 문
+  document.getElementById('door_toggle').checked=s.door_toggle||false;
+  document.getElementById('door_rate').value=s.door_rate||'400000';
+  doorMatCnt=s.doorMatCnt||0;doorLaborCnt=s.doorLaborCnt||0;
+  set('door_mat_cnt',doorMatCnt);
+  set('door_labor_cnt',doorLaborCnt);
+  set('door_labor_cnt_disp',doorLaborCnt);
+  // UI 갱신
+  renderList();
+  if(wallList.length>0)calcWallTotal();
+  calcWall();
+  calcCeiling();
+  updateCeilingMode();
+  updateCostTab();
+  calcLabor();
+}
+
+function saveSite(){
+  // 현재 선택된 현장이 있으면 바로 덮어쓰기, 없으면 이름 입력
+  const sel=document.getElementById('site_select');
+  if(sel.value){
+    const sites=getSites();
+    sites[sel.value]=collectState();
+    setSites(sites);
+    showToast('💾 저장됐어요: '+sel.value);
+  } else {
+    // 이름 입력 창 표시
+    document.getElementById('site_name_bar').style.display='flex';
+    document.getElementById('site_name').focus();
+  }
+}
+
+function confirmSave(){
+  const name=document.getElementById('site_name').value.trim();
+  if(!name){alert('현장명을 입력해주세요.');return;}
+  const sites=getSites();
+  sites[name]=collectState();
+  setSites(sites);
+  refreshSiteSelect(name);
+  document.getElementById('site_name_bar').style.display='none';
+  document.getElementById('site_name').value='';
+  showToast('💾 저장됐어요: '+name);
+}
+
+function cancelSave(){
+  document.getElementById('site_name_bar').style.display='none';
+  document.getElementById('site_name').value='';
+}
+
+function newSite(){
+  document.getElementById('site_select').value='';
+  document.getElementById('site_name_bar').style.display='flex';
+  document.getElementById('site_name').focus();
+}
+
+function loadSite(){
+  const sel=document.getElementById('site_select');
+  if(!sel.value)return;
+  const sites=getSites();
+  const s=sites[sel.value];
+  if(!s)return;
+  if(confirm(sel.value+' 현장을 불러올까요?')){
+    applyState(s);
+    showToast('불러왔어요: '+sel.value);
+  } else {
+    sel.value='';
+  }
+}
+
+function deleteSite(){
+  const sel=document.getElementById('site_select');
+  if(!sel.value){alert('삭제할 현장을 선택해주세요.');return;}
+  if(!confirm(sel.value+' 현장을 삭제할까요?'))return;
+  const sites=getSites();
+  delete sites[sel.value];
+  setSites(sites);
+  refreshSiteSelect('');
+  showToast('삭제됐어요');
+}
+
+function showToast(msg){
+  let t=document.getElementById('toast_msg');
+  if(!t){t=document.createElement('div');t.id='toast_msg';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(200,160,74,.95);color:#0e0e0e;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;pointer-events:none;transition:opacity .3s';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.style.opacity='0';},2000);
+}
+
+// 초기 현장 목록 로드
+window.addEventListener('DOMContentLoaded',()=>refreshSiteSelect(''));
+
+function showTab(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');btn.classList.add('on');
+  if(id==='cost')updateCostTab();
+}
+function showSubTab(id,btn){
+  document.querySelectorAll('.sub-sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('sub-'+id).classList.add('on');btn.classList.add('on');
+}
+function setType(v){tpMode=v;['1p','2p','4p'].forEach(t=>document.getElementById('tp_'+t).classList.remove('on'));document.getElementById('tp_'+v).classList.add('on');calcWall();}
+function setGbPly(v){gbPly=v;document.getElementById('gb_2ply').classList.toggle('on',v===2);document.getElementById('gb_1ply').classList.toggle('on',v===1);updateCeilingMode();calcCeiling();updateGrandTotal();}
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function fmt(n){return Math.round(n).toLocaleString('ko-KR');}
+function typeLabel(tp){return tp==='1p'?'벽체 1P':tp==='2p'?'벽체 2P':'가벽 2P+2P';}
+
+// setArea replaced
+
+function updateCeilingMode(){
+  const is1=gbPly===1;
+  document.getElementById('dorans_content').style.display=is1?'none':'block';
+  document.getElementById('dorans_skip').style.display=is1?'block':'none';
+  document.getElementById('gbsang_content').style.display=is1?'none':'block';
+  document.getElementById('gbsang_skip').style.display=is1?'block':'none';
+  document.getElementById('mat_dk_item').style.display=is1?'none':'block';
+  document.getElementById('mat_ply_item').style.display=is1?'none':'block';
+}
+
+function computeGipsum(W,H,tp){
+  const low=H<=2700,is1p=tp==='1p',is4p=tp==='4p';
+  const f1=Math.ceil(W/900),f2=low?Math.round(f1/2):f1,sum=f1+f2;
+  return{f1,f2,sum,ply:sum*(is1p?1:is4p?4:2),low};
+}
+function computeKakjae(W,tp){
+  const is1p=tp==='1p',is4p=tp==='4p';
+  if(is1p)return{danKachi:0,is1p,is4p};
+  const vBar=Math.ceil(W/450)+1,hBar=Math.ceil(W/3600)*2,total=vBar+hBar;
+  return{danKachi:total,is1p,is4p};
+}
+
+function calcWall(){
+  const W=parseFloat(document.getElementById('w_w').value)||0;
+  const H=parseFloat(document.getElementById('w_h').value)||0;
+  const low=H<=2700;
+  set('ch_hint',low?'* 2700mm 이하':'* 2700mm 초과');
+  const sqm=(W/1000)*(H/1000);
+  const py=sqm/3.3058;
+
+  // 벽면 면적: 올림 표시, 원본 작은글씨
+  const sqmCeil=Math.ceil(sqm);
+  const pyCeil=Math.ceil(py);
+  set('w_sqm', sqmCeil+' ㎡');
+  set('w_py_small', '('+sqm.toFixed(1)+'㎡ / '+py.toFixed(1)+'평)');
+
+  // 시공 면적: 올림값 기준으로 계산
+  const is1p=tpMode==='1p',is4p=tpMode==='4p';
+  let constrSqm, constrLabel;
+  if(is1p){constrSqm=Math.ceil(sqmCeil/2);constrLabel='시공 면적 (÷2)';}
+  else if(is4p){constrSqm=sqmCeil*2;constrLabel='시공 면적 (×2)';}
+  else{constrSqm=sqmCeil;constrLabel='시공 면적';}
+  const constrPy=Math.ceil(constrSqm/3.3058);
+  set('w_constr_lbl',constrLabel);
+  set('w_constr_sqm',constrSqm+' ㎡');
+  set('w_constr_py','↑ '+constrPy+' 평');
+
+  document.getElementById('kakjae_card').style.display=is1p?'none':'block';
+  if(!is1p){
+    const vRaw=W/450,vCeil=Math.ceil(vRaw),vBar=vCeil+1;
+    const hRaw=W/3600,hCeil=Math.ceil(hRaw),hBar=hCeil*2;
+    const total=vBar+hBar,danUnit=is4p?6:12,danRaw=total/danUnit,mat=is4p?'투바이':'다루끼';
+    set('kakjae_label',mat);set('kk_dan_lbl',mat+' 필요 단수');
+    set('kk_fv',W+' ÷ 450 = '+vRaw.toFixed(2)+' → 올림 '+vCeil+' + 1');
+    set('kk_fh',W+' ÷ 3600 = '+hRaw.toFixed(2)+' → 올림 '+hCeil+' × 2');
+    set('kk_total_hint','세로상 '+vBar+'까치 + 가로상 '+hBar+'까치');
+    set('kk_total',total+' 까치');
+    set('kk_fdan',total+' ÷ '+danUnit+' = '+danRaw.toFixed(2));
+    set('kk_dan',Math.ceil(danRaw)+' 단');
+  }
+  const g=computeGipsum(W,H,tpMode);
+  const plyLabel=is1p?'×1P':is4p?'×4P(양면)':'×2P';
+  const str=low
+    ?'1F: '+W+' ÷ 900 = '+(W/900).toFixed(2)+' → 올림 = '+g.f1+'장\n2F: ROUND('+g.f1+' ÷ 2) = '+g.f2+'장\n합계: '+g.f1+' + '+g.f2+' = '+g.sum+'장'
+    :'1F: '+W+' ÷ 900 = '+(W/900).toFixed(2)+' → 올림 = '+g.f1+'장\n2F: 1F 그대로 = '+g.f2+'장\n합계: '+g.f1+' + '+g.f2+' = '+g.sum+'장';
+  set('gb_f1f2f',str);set('gb_sum',g.sum+' 장');
+  set('gb_fply',g.sum+' '+plyLabel+' = '+g.ply+'장');set('gb_ply',g.ply+' 장');
+  const noteEl=document.getElementById('w_area_note');
+  noteEl.style.display='none';
+}
+
+function addWall(){
+  const W=parseFloat(document.getElementById('w_w').value)||0;
+  const H=parseFloat(document.getElementById('w_h').value)||0;
+  if(!W||!H)return;
+  const k=computeKakjae(W,tpMode);
+  const g=computeGipsum(W,H,tpMode);
+  const sqm=(W/1000)*(H/1000);
+  const is1p=tpMode==='1p',is4p=tpMode==='4p';
+  const sqmCeil=Math.ceil(sqm);
+  const constrSqm=is1p?Math.ceil(sqmCeil/2):is4p?sqmCeil*2:sqmCeil;
+  wallList.push({id:++idSeq,W,H,tp:tpMode,sqm,sqmCeil,constrSqm,...k,ply:g.ply});
+  renderList();
+}
+function deleteWall(id){wallList=wallList.filter(w=>w.id!==id);renderList();}
+
+function calcWallTotal(){
+  if(!wallList.length)return;
+  let dK=0,tK=0,gb=0,totalSqm=0;
+  let totalConstrSqm=0;
+  wallList.forEach(w=>{totalSqm+=w.sqm;totalConstrSqm+=w.constrSqm;if(!w.is1p){w.is4p?tK+=w.danKachi:dK+=w.danKachi;}gb+=w.ply;});
+  wallDKkachi=dK;wallDK=Math.ceil(dK/12);wallTBkachi=tK;wallTB=Math.ceil(tK/6);wallGB=gb;
+  document.getElementById('wall_total_card').style.display='block';
+  set('sum_area',totalSqm.toFixed(1)+' ㎡  /  ↑'+Math.ceil(totalSqm/3.3058)+' 평');
+  set('sum_constr_area',Math.round(totalConstrSqm)+' ㎡  /  '+Math.round(totalConstrSqm/3.3058)+' 평');
+  set('sum_dk',dK>0?dK+' 까치':'—');set('sum_dd',dK>0?wallDK+' 단':'—');
+  set('sum_tk',tK>0?tK+' 까치':'—');set('sum_td',tK>0?wallTB+' 단':'—');
+  set('sum_gb',gb+' 장');
+}
+function renderList(){
+  const list=document.getElementById('wall_list');
+  set('wall_count',wallList.length+'개');
+  document.getElementById('wall_total_card').style.display='none';
+  wallDK=0;wallDKkachi=0;wallTB=0;wallTBkachi=0;wallGB=0;
+  if(!wallList.length){list.innerHTML='<div class="empty">추가된 벽체가 없어요</div>';return;}
+  list.innerHTML=wallList.map((w,i)=>{
+    const constrLabel=w.is1p?'시공면적(÷2)':w.is4p?'시공면적(×2)':'시공 면적';
+    const constrPy=w.constrSqm/3.3058;
+    return`<div class="wall-item">
+      <div class="wall-item-hd"><div style="display:flex;align-items:center"><span class="wall-no">#${i+1}</span><span class="wall-tp" style="background:rgba(200,160,74,.15);color:var(--accent);border-color:rgba(200,160,74,.4)">${typeLabel(w.tp)}</span></div><button class="del-btn" onclick="deleteWall(${w.id})">삭제</button></div>
+      <div class="wall-dims">${w.W.toLocaleString()} × ${w.H.toLocaleString()} mm</div>
+      <div class="wall-dims-sub">${w.H<=2700?'천고 2700이하':'천고 2700초과'}</div>
+      <div class="wall-vals" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="wv"><div class="wv-lbl">${w.is4p?'투바이':'다루끼'}</div><div class="wv-val">${w.is1p?'—':w.danKachi+' 까치'}</div></div>
+        <div class="wv"><div class="wv-lbl">석고보드</div><div class="wv-val">${w.ply} 장</div></div>
+        <div class="wv"><div class="wv-lbl">벽면 면적</div><div class="wv-val">${w.sqmCeil||Math.ceil(w.sqm)} ㎡</div><div style="font-size:10px;color:var(--text3)">${w.sqm.toFixed(1)}㎡ / ↑${Math.ceil(w.sqm/3.3058)}평</div></div>
+        <div class="wv"><div class="wv-lbl" style="color:var(--accent)">${constrLabel}</div><div class="wv-val" style="color:var(--accent)">${Math.round(w.constrSqm)} ㎡</div><div style="font-size:10px;color:var(--accent)">${Math.round(constrPy)}평</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateGbDisplay(){
+  const total=cgShortVal*cgLongVal*gbPly;
+  ceilGB=total;
+  set('gb_ply_tag',gbPly===2?'2PLY':'1PLY (덧방)');
+  set('cg_ftotal',cgShortVal+'장 × '+cgLongVal+'장 × '+gbPly+'PLY = '+total+'장');
+  set('cg_total',total+' 장');
+  set('mat_gb',total+' 장');
+  set('mat_gb_ply',gbPly===2?'2PLY 적용':'1PLY (덧방)');
+}
+
+function showCeilTotal(){
+  const card=document.getElementById('ceil_total_card');
+  if(!card)return;
+  card.style.display='block';
+  const LONG=parseFloat(document.getElementById('c_long').value)||0;
+  const SHORT=parseFloat(document.getElementById('c_short').value)||0;
+  const DH=parseFloat(document.getElementById('d_height').value)||0;
+  if(gbPly===2){
+    // 다루끼: 도란스다루끼 + 석고보드상다루끼
+    const doransDK=parseInt((document.getElementById('d_kachi_total')||{}).textContent)||0;
+    const gbsangDK=parseInt((document.getElementById('gs_total')||{}).textContent)||0;
+    const totalDK=ceilDKkachi;
+    set('ct_dk_formula','도란스 '+doransDK+'까치 + 석고보드상 '+gbsangDK+'까치 = '+totalDK+'까치');
+    set('ct_dk_kachi', totalDK>0?totalDK+' 까치':'—');
+    set('ct_dk_dan', ceilDK>0?'→ '+ceilDK+' 단':'—');
+    // 합판: SHORT÷2400×도란스수÷분할수
+    const count=Math.ceil(LONG/500)+1;
+    const p1=Math.ceil(SHORT/2400);
+    const split=Math.floor(1200/DH);
+    set('ct_ply_formula','(SHORT '+SHORT+'÷2400='+p1+') × '+count+'개 ÷ 분할'+split+'개');
+    set('ct_ply', ceilPly>0?ceilPly+' 장':'—');
+    // 석고보드
+    const cgS=Math.ceil(SHORT/900),cgL=Math.ceil(LONG/1800);
+    set('ct_gb_formula',cgS+'장 × '+cgL+'장 × 2PLY = '+ceilGB+'장');
+    set('ct_gb', ceilGB>0?ceilGB+' 장':'—');
+  } else {
+    set('ct_dk_formula','1PLY 덧방 — 도란스/석고보드상 제외');
+    set('ct_dk_kachi','— (덧방)');set('ct_dk_dan','');
+    set('ct_ply_formula','1PLY 덧방 — 합판 제외');
+    set('ct_ply','— (덧방)');
+    const cgS=Math.ceil(SHORT/900),cgL=Math.ceil(LONG/1800);
+    set('ct_gb_formula',cgS+'장 × '+cgL+'장 × 1PLY = '+ceilGB+'장');
+    set('ct_gb', ceilGB>0?ceilGB+' 장':'—');
+  }
+}
+
+function calcCeiling(){
+  const LONG=parseFloat(document.getElementById('c_long').value)||0;
+  const SHORT=parseFloat(document.getElementById('c_short').value)||0;
+  const DH=parseFloat(document.getElementById('d_height').value)||0;
+  const sqm=(LONG/1000)*(SHORT/1000);
+  ceilSqm=sqm;ceilPy=sqm/3.3058;
+  // 천장 면적 표시
+  const cpy=sqm/3.3058;
+  set('c_sqm', Math.ceil(sqm)+' ㎡');
+  set('c_py_small', '('+sqm.toFixed(1)+'㎡ / '+cpy.toFixed(1)+'평)');
+  // 시공면적: 2PLY=×2, 1PLY덧방=÷2
+  const sqmC=Math.ceil(sqm);
+  let cConstrSqm, cConstrLbl;
+  if(gbPly===2){cConstrSqm=sqmC*2;cConstrLbl='시공 면적 (×2)';}
+  else{cConstrSqm=Math.ceil(sqmC/2);cConstrLbl='시공 면적 (÷2 덧방)';}
+  const cConstrPy=Math.ceil(cConstrSqm/3.3058);
+  set('c_constr_lbl',cConstrLbl);
+  set('c_constr_sqm',cConstrSqm+' ㎡');
+  set('c_constr_py','↑ '+cConstrPy+' 평');
+  if(gbPly===2){
+    const cR=LONG/500,count=Math.ceil(cR)+1;
+    set('d_fcount',LONG+' ÷ 500 = '+cR.toFixed(2)+' → 올림+1');set('d_count',count+' 개');
+    const vR=SHORT/400,vBar=Math.ceil(vR)+1;
+    set('d_fvbar',SHORT+' ÷ 400 = '+vR.toFixed(2)+' → 올림+1');set('d_vbar',vBar+' 개');
+    const hR=SHORT/3600,hBar=Math.ceil(hR)*2;
+    set('d_fhbar',SHORT+' ÷ 3600 = '+hR.toFixed(2)+' → 올림×2');set('d_hbar',hBar+' 개');
+    const hTotal=hBar*count;
+    set('d_fhbar_total',hBar+' × '+count+'개 = '+hTotal);set('d_hbar_total',hTotal+' 까치');
+    const vTR=(vBar*count*DH)/3600,vTotal=Math.ceil(vTR);
+    set('d_fvbar_total',vBar+' × '+count+' × '+DH+' ÷ 3600 = '+vTR.toFixed(2));set('d_vbar_total',vTotal+' 까치');
+    const dKachi=hTotal+vTotal,dDan=Math.ceil(dKachi/12);
+    set('d_kachi_hint','가로상 '+hTotal+'까치 + 세로상 '+vTotal+'까치');
+    set('d_kachi_total',dKachi+' 까치');set('d_fdan',dKachi+' ÷ 12 = '+(dKachi/12).toFixed(2));set('d_dan',dDan+' 단');
+    const p1R=SHORT/2400,p1=Math.ceil(p1R);
+    set('d_fply1',SHORT+' ÷ 2400 = '+p1R.toFixed(2)+' → 올림');set('d_ply1',p1+' 장');
+    const split=Math.floor(1200/DH);
+    set('d_fsplit','1200 ÷ '+DH+' = '+(1200/DH).toFixed(2)+' → 버림');set('d_split',split+' 개/장');
+    const pR=p1*count,dPly=Math.ceil(pR/split);
+    set('d_fply_raw',p1+' × '+count+'개 = '+pR);set('d_ply_raw',pR+' 장');
+    set('d_fply_total',pR+' ÷ '+split+' = '+(pR/split).toFixed(2));set('d_ply_total',dPly+' 장');
+    const gsV=Math.ceil(SHORT/450)+1,gsH=Math.ceil(LONG/3600),gsTotal=gsV*gsH,gsDan=Math.ceil(gsTotal/12);
+    set('gs_fv','('+SHORT+' ÷ 450) + 1 = '+(SHORT/450+1).toFixed(2)+' → 올림 = '+gsV+'개');
+    set('gs_v',gsV+' 개');set('gs_fh',LONG+' ÷ 3600 = '+(LONG/3600).toFixed(2)+' → 올림 = '+gsH+'개');
+    set('gs_h',gsH+' 개');set('gs_total_hint','세로 '+gsV+'개 × 가로 '+gsH+'개 = '+gsTotal+'까치');
+    set('gs_total',gsTotal+' 까치');set('gs_fdan',gsTotal+' ÷ 12 = '+(gsTotal/12).toFixed(2));set('gs_dan',gsDan+' 단');
+    const totalDK=dKachi+gsTotal;
+    ceilDKkachi=totalDK;ceilDK=Math.ceil(totalDK/12);ceilPly=dPly;
+    set('mat_dk_kachi',totalDK+' 까치');set('mat_dk_dan','↑ '+ceilDK+' 단');set('mat_ply',dPly+' 장');
+  } else {
+    ceilDKkachi=0;ceilDK=0;ceilPly=0;
+    set('mat_dk_kachi','—');set('mat_dk_dan','제외 (덧방)');set('mat_ply','—');
+  }
+  cgShortVal=Math.ceil(SHORT/900);cgLongVal=Math.ceil(LONG/1800);
+  set('cg_fshort',SHORT+' ÷ 900 = '+(SHORT/900).toFixed(2)+' → 올림 = '+cgShortVal+'장');
+  set('cg_short',cgShortVal+' 장');
+  set('cg_flong',LONG+' ÷ 1800 = '+(LONG/1800).toFixed(2)+' → 올림 = '+cgLongVal+'장');
+  set('cg_long',cgLongVal+' 장');
+  updateGbDisplay();
+}
+
+function updateCostTab(){
+  const totalDKkachi=wallDKkachi+ceilDKkachi;
+  const totalDK=Math.ceil(totalDKkachi/12);
+  const totalTBkachi=wallTBkachi,totalTB=Math.ceil(totalTBkachi/6);
+  const totalGB=wallGB+ceilGB;
+  const plyLabel=gbPly===2?'천장 2PLY':'천장 1PLY (덧방)';
+
+  // ─ 소요량 표 동적 생성 ─
+  const thead=document.getElementById('soyo_thead');
+  const tbody=document.getElementById('soyo_tbody');
+  if(thead&&tbody){
+    // 헤더: 자재 + 벽체별 열 + 천장 열
+    let hHtml='<tr><th style="text-align:left;padding:6px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border2);white-space:nowrap">자재</th>';
+    wallList.forEach((w,i)=>{
+      hHtml+=`<th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2);white-space:nowrap">#${i+1}</th>`;
+    });
+    hHtml+='<th style="text-align:right;padding:6px 4px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border2)">천장</th>';
+    hHtml+='<th style="text-align:right;padding:6px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border2)">합계</th></tr>';
+    thead.innerHTML=hHtml;
+
+    const td=(v,acc)=>`<td style="text-align:right;padding:7px 4px;color:${acc?'var(--accent)':'var(--text)'};font-weight:${acc?'700':'400'};border-bottom:1px solid var(--border)">${v}</td>`;
+    const tdLast=(v,acc)=>`<td style="text-align:right;padding:7px 4px;color:${acc?'var(--accent)':'var(--text)'};font-weight:${acc?'700':'400'}">${v}</td>`;
+
+    // 다루끼행
+    let dkRow=`<tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">다루끼</td>`;
+    let dkSum=0;
+    wallList.forEach(w=>{const k=w.is1p?0:w.is4p?0:w.danKachi;dkSum+=k;dkRow+=td(k>0?String(k):'—',false);});
+    dkRow+=td(ceilDKkachi>0?String(ceilDKkachi):'—',false);
+    dkRow+=`<td style="text-align:right;padding:7px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border)">${totalDKkachi>0?totalDKkachi+'까치<br><span style=\"font-size:13px\">→'+totalDK+'단</span>':'—'}</td></tr>`;
+
+    // 투바이행
+    let tbRow=`<tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">투바이</td>`;
+    let tbKachiSum=0;
+    wallList.forEach(w=>{const k=w.is4p?w.danKachi:0;tbKachiSum+=k;tbRow+=td(k>0?String(k):'—',false);});
+    tbRow+=td('—',false);
+    tbRow+=`<td style="text-align:right;padding:7px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border)">${tbKachiSum>0?tbKachiSum+'까치<br><span style=\"font-size:13px\">→'+totalTB+'단</span>':'—'}</td></tr>`;
+
+    // 합판행
+    let plyRow=`<tr><td style="padding:7px 4px;color:var(--accent);font-weight:600;border-bottom:1px solid var(--border)">합판 5T</td>`;
+    wallList.forEach(()=>{plyRow+=td('—',false);});
+    plyRow+=td(ceilPly>0?String(ceilPly):'덧방',false);
+    plyRow+=`<td style="text-align:right;padding:7px 4px;color:var(--accent);font-weight:700;border-bottom:1px solid var(--border)">${ceilPly>0?ceilPly+'장':'—'}</td></tr>`;
+
+    // 석고보드행
+    let gbRow=`<tr><td style="padding:7px 4px;color:var(--accent);font-weight:600">석고보드</td>`;
+    let wallGbSum=0;
+    wallList.forEach(w=>{wallGbSum+=w.ply;gbRow+=`<td style="text-align:right;padding:7px 4px;color:var(--text)">${w.ply>0?String(w.ply):'—'}</td>`;});
+    gbRow+=`<td style="text-align:right;padding:7px 4px;color:var(--text)">${ceilGB>0?String(ceilGB):gbPly===1?'덧방':'—'}</td>`;
+    gbRow+=`<td style="text-align:right;padding:7px 4px;color:var(--accent);font-weight:700">${totalGB>0?totalGB+'장':'—'}</td></tr>`;
+
+    tbody.innerHTML=dkRow+tbRow+plyRow+gbRow;
+
+
+  }
+
+  // hidden compat
+  set('c_wall_dk',wallDK>0?wallDK+' 단':'—');
+  set('c_ceil_dk',ceilDK>0?ceilDK+' 단':'—');
+  set('c_wall_tb',wallTB>0?wallTB+' 단':'—');
+  set('c_ceil_ply',ceilPly>0?ceilPly+' 장':'—');
+  set('c_wall_gb',wallGB>0?wallGB+' 장':'—');
+  set('c_ceil_gb',ceilGB>0?ceilGB+' 장':'—');
+
+  set('pq_dk_kachi','전체 '+totalDKkachi+' 까치');
+  set('pq_dk','→ '+totalDK+' 단 (÷12 올림)');
+  set('pq_tb_kachi','전체 '+totalTBkachi+' 까치');
+  set('pq_tb','→ '+totalTB+' 단 (÷6 올림)');
+  set('pq_ply',ceilPly>0?ceilPly+' 장':'— 장 (덧방 제외)');
+  set('pq_gb',totalGB>0?totalGB+' 장':'— 장');
+  calcCost();calcLabor();
+}
+
+function calcCost(){
+  const totalDKkachi=wallDKkachi+ceilDKkachi;
+  const totalDK=Math.ceil(totalDKkachi/12),totalTB=Math.ceil(wallTBkachi/6);
+  const totalPly=ceilPly,totalGB=wallGB+ceilGB;
+  const pDK=parseFloat(document.getElementById('pu_dk').value)||0;
+  const pTB=parseFloat(document.getElementById('pu_tb').value)||0;
+  const pPly=parseFloat(document.getElementById('pu_ply').value)||0;
+  const pGB=parseFloat(document.getElementById('pu_gb').value)||0;
+  const rDK=totalDK*pDK,rTB=totalTB*pTB,rPly=totalPly*pPly,rGB=totalGB*pGB;
+  const total=rDK+rTB+rPly+rGB;
+  set('pr_dk',pDK>0?fmt(rDK)+' 원':'—');set('pr_tb',pTB>0?fmt(rTB)+' 원':'—');
+  set('pr_ply',pPly>0?fmt(rPly)+' 원':'—');set('pr_gb',pGB>0?fmt(rGB)+' 원':'—');
+  set('cost_total',fmt(total)+' 원');
+  const parts=[];
+  if(rDK>0)parts.push('다루끼 '+fmt(rDK));if(rTB>0)parts.push('투바이 '+fmt(rTB));
+  if(rPly>0)parts.push('합판 '+fmt(rPly));if(rGB>0)parts.push('석고 '+fmt(rGB));
+  set('cost_breakdown',parts.length>0?parts.join(' + '):'단가를 입력하면 자동 계산됩니다');
+  if(ceilSqm>0){
+    const subCost=Math.ceil(ceilPy)*15000;
+    set('sub_cost_total',fmt(subCost)+' 원');
+    set('sub_cost_hint','천장 '+ceilSqm.toFixed(1)+'㎡ / '+ceilPy.toFixed(1)+'평 → ↑'+Math.ceil(ceilPy)+'평 × 15,000');
+  } else {set('sub_cost_total','0 원');set('sub_cost_hint','천장 면적을 먼저 입력하세요');}
+  // 문 자재비
+  const doorMatTotal=doorMatCnt*300000;
+  set('door_mat_cnt',doorMatCnt);
+  set('door_mat_total',fmt(doorMatTotal)+' 원');
+  set('door_mat_hint',doorMatCnt>0?doorMatCnt+'개 × 300,000 = '+fmt(doorMatTotal)+'원':'문 수량을 추가하면 자동 계산됩니다');
+  updateGrandTotal();
+}
+
+function updateGrandTotal(){
+  // 각 항목 금액 수집
+  const matTotal=parseTotal('cost_total');
+  const laborTotal=parseTotal('labor_total');
+  const doorMatTotal=doorMatCnt*300000;
+  const subTotal=ceilSqm>0?Math.ceil(ceilPy)*15000:0;
+  const grand=matTotal+laborTotal+doorMatTotal+subTotal;
+  set('grand_mat',fmt(matTotal)+' 원');
+  set('grand_labor',fmt(laborTotal)+' 원');
+  set('grand_door',fmt(doorMatTotal)+' 원');
+  set('grand_sub',fmt(subTotal)+' 원');
+  set('grand_total',fmt(grand)+' 원');
+  const lines=[];
+  if(matTotal>0)lines.push('자재비 '+fmt(matTotal));
+  if(laborTotal>0)lines.push('인건비 '+fmt(laborTotal));
+  if(doorMatTotal>0)lines.push('문자재 '+fmt(doorMatTotal));
+  if(subTotal>0)lines.push('부자재 '+fmt(subTotal));
+  set('grand_breakdown',lines.length>0?lines.join(' + '):'항목을 입력하면 합계가 표시됩니다');
+}
+
+function parseTotal(id){
+  const el=document.getElementById(id);
+  if(!el)return 0;
+  return parseInt(el.textContent.replace(/[^0-9]/g,''))||0;
+}
+
+// 문 자재비 수량
+function adjDoorMat(d){
+  doorMatCnt=Math.max(0,doorMatCnt+d);
+  // 문 자재비와 인건비 수량 항상 동기화
+  doorLaborCnt=doorMatCnt;
+  // 1개 이상이면 인건비 토글 ON, 0이면 OFF
+  const toggle=document.getElementById('door_toggle');
+  if(toggle){
+    toggle.checked=(doorMatCnt>=1);
+  }
+  // door_mat_cnt + 인건비 표시 동기화
+  set('door_mat_cnt',doorMatCnt);
+  set('door_labor_cnt',doorMatCnt);
+  set('door_labor_cnt_disp',doorMatCnt);
+  calcCost();
+  calcLabor();
+}
+
+// 인건비
+function getBaseDays(area){
+  if(area>=50&&area<70)return 3;if(area>=70&&area<100)return 4;
+  if(area>=100&&area<150)return 5;if(area>=150&&area<200)return 6;
+  if(area>=200&&area<=250)return 7;return null;
+}
+function adjDay(d){const next=baseDays+adjDays+d;if(next<1)return;adjDays+=d;calcLabor();}
+function adjDoorLabor(d){
+  doorLaborCnt=Math.max(0,doorLaborCnt+d);
+  set('door_labor_cnt',doorLaborCnt);
+  set('door_labor_cnt_disp',doorLaborCnt);
+  calcLabor();
+}
+
+function highlightRange(area){
+  ['r1','r2','r3','r4','r5','r6'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  if(area>=50&&area<70)document.getElementById('r1').classList.add('active');
+  else if(area>=70&&area<100)document.getElementById('r2').classList.add('active');
+  else if(area>=100&&area<150)document.getElementById('r3').classList.add('active');
+  else if(area>=150&&area<200)document.getElementById('r4').classList.add('active');
+  else if(area>=200&&area<=250)document.getElementById('r5').classList.add('active');
+  else document.getElementById('r6').classList.add('active');
+}
+
+function onDoorToggle(){
+  const on=document.getElementById('door_toggle').checked;
+  // 기본값 2개 세팅
+  if(on && doorLaborCnt===0) doorLaborCnt=2;
+  calcLabor();
+}
+
+function exportExcel(){
+  if(typeof XLSX==='undefined'){alert('SheetJS 로딩 중입니다. 잠시 후 다시 시도해주세요.');return;}
+  const wb=XLSX.utils.book_new();
+
+  // ── 시트1: 벽체 목록 ──
+  const wallRows=[
+    ['#','시공종류','가로(mm)','세로(mm)','벽면면적(㎡)','시공면적(㎡)','다루끼(까치)','석고보드(장)']
+  ];
+  wallList.forEach((w,i)=>{
+    wallRows.push([
+      i+1,
+      typeLabel(w.tp),
+      w.W, w.H,
+      w.sqmCeil||Math.ceil(w.sqm),
+      w.constrSqm,
+      w.is1p?0:w.danKachi,
+      w.ply
+    ]);
+  });
+  // 벽체 합계
+  let wTotSqm=0,wTotConstr=0,wTotDK=0,wTotGB=0;
+  wallList.forEach(w=>{wTotSqm+=w.sqmCeil||Math.ceil(w.sqm);wTotConstr+=w.constrSqm;wTotDK+=w.is1p?0:w.danKachi;wTotGB+=w.ply;});
+  wallRows.push(['','합계','','',wTotSqm,wTotConstr,wTotDK,wTotGB]);
+  const ws1=XLSX.utils.aoa_to_sheet(wallRows);
+  ws1['!cols']=[{wch:4},{wch:12},{wch:10},{wch:10},{wch:12},{wch:12},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws1,'벽체 목록');
+
+  // ── 시트2: 천장 정보 ──
+  const LONG=parseFloat(document.getElementById('c_long').value)||0;
+  const SHORT=parseFloat(document.getElementById('c_short').value)||0;
+  const DH=parseFloat(document.getElementById('d_height').value)||0;
+  const ceilSqmCeil=Math.ceil(ceilSqm);
+  const cConstrSqm=gbPly===2?ceilSqmCeil*2:Math.ceil(ceilSqmCeil/2);
+  const ceilRows=[
+    ['항목','값','단위'],
+    ['가로(긴면)',LONG,'mm'],
+    ['세로(짧은면)',SHORT,'mm'],
+    ['단내림 높이',DH,'mm'],
+    ['천장 면적',ceilSqmCeil,'㎡'],
+    ['시공 면적('+( gbPly===2?'×2':'÷2')+')',cConstrSqm,'㎡'],
+    ['시공 방식',gbPly===2?'2PLY 신규':'1PLY 덧방',''],
+    [''],
+    ['자재','수량','단위'],
+    ['다루끼',ceilDKkachi,'까치'],
+    ['다루끼',ceilDK,'단'],
+    ['합판 5T',ceilPly,'장'],
+    ['석고보드',ceilGB,'장'],
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(ceilRows);
+  ws2['!cols']=[{wch:18},{wch:12},{wch:8}];
+  XLSX.utils.book_append_sheet(wb,ws2,'천장 정보');
+
+  // ── 시트3: 목공 가견적 ──
+  const totalDKkachi=wallDKkachi+ceilDKkachi;
+  const totalDK=Math.ceil(totalDKkachi/12);
+  const totalTB=Math.ceil(wallTBkachi/6);
+  const totalGB=wallGB+ceilGB;
+  const pDK=parseFloat(document.getElementById('pu_dk').value)||0;
+  const pTB=parseFloat(document.getElementById('pu_tb').value)||0;
+  const pPly=parseFloat(document.getElementById('pu_ply').value)||0;
+  const pGB=parseFloat(document.getElementById('pu_gb').value)||0;
+  const rDK=totalDK*pDK,rTB=totalTB*pTB,rPly=ceilPly*pPly,rGB=totalGB*pGB;
+  const matTotal=rDK+rTB+rPly+rGB;
+
+  const chiefOn=document.getElementById('chief_toggle')?.checked??true;
+  const assistOn=document.getElementById('assist_toggle').checked;
+  const chiefRate=parseFloat(document.getElementById('chief_rate').value)||0;
+  const assistRate=parseFloat(document.getElementById('assist_rate').value)||0;
+  const laborAreaVal=parseInt(document.getElementById('labor_area_disp').textContent)||0;
+  const totalDays=parseInt(document.getElementById('day_disp').textContent)||0;
+  const chiefTotal=chiefOn?chiefRate*totalDays:0;
+  const assistTotal=assistOn?assistRate*totalDays:0;
+  const doorOn=document.getElementById('door_toggle').checked;
+  const doorRate=parseFloat(document.getElementById('door_rate').value)||0;
+  const doorSets=Math.ceil(doorLaborCnt/2);
+  const doorLaborAmt=doorOn?doorSets*doorRate:0;
+  const laborTotal=chiefTotal+assistTotal+doorLaborAmt;
+
+  const doorMatTotal=doorMatCnt*300000;
+  const subTotal=ceilSqm>0?Math.ceil(ceilPy)*15000:0;
+  const grandTotal=matTotal+laborTotal+doorMatTotal+subTotal;
+
+  const estimateRows=[
+    ['목공 가견적서','','','',''],
+    ['작성일',new Date().toLocaleDateString('ko-KR'),'','',''],
+    [''],
+    ['【자재비】','','','',''],
+    ['자재','수량','단가(원)','금액(원)',''],
+    ['다루끼 30×30×3600',totalDK+'단',pDK,rDK,''],
+    ['투바이 30×70×3600',totalTB+'단',pTB,rTB,''],
+    ['합판 5T 1220×2440',ceilPly+'장',pPly,rPly,''],
+    ['석고보드 900×1800',totalGB+'장',pGB,rGB,''],
+    ['','','자재비 합계',matTotal,''],
+    [''],
+    ['【인건비】','','','',''],
+    ['항목','일수/수량','단가(원)','금액(원)',''],
+    ['대장목수',chiefOn?totalDays+'일':'(제외)',chiefOn?chiefRate:0,chiefTotal,''],
+    ['보조목수',assistOn?totalDays+'일':'(제외)',assistOn?assistRate:0,assistTotal,''],
+    ['문설치 인건비',doorOn?doorLaborCnt+'개('+doorSets+'품)':'(제외)',doorOn?doorRate:0,doorLaborAmt,''],
+    ['','','인건비 합계',laborTotal,''],
+    [''],
+    ['【기타】','','','',''],
+    ['문 설치 자재비',doorMatCnt+'개','300,000',doorMatTotal,''],
+    ['부자재비',Math.ceil(ceilPy)+'평','15,000',subTotal,''],
+    [''],
+    ['','','','',''],
+    ['','','','최종 합계',grandTotal],
+  ];
+  const ws3=XLSX.utils.aoa_to_sheet(estimateRows);
+  ws3['!cols']=[{wch:24},{wch:14},{wch:12},{wch:14},{wch:6}];
+  // 숫자 서식
+  ['D6','D7','D8','D9','D10','D14','D15','D16','D17','D20','D21','E24'].forEach(cell=>{
+    if(ws3[cell])ws3[cell].t='n';
+  });
+  XLSX.utils.book_append_sheet(wb,ws3,'목공 가견적');
+
+  // ── 다운로드 ──
+  const date=new Date();
+  const siteName=document.getElementById('site_select')?.value||'';
+  const dateStr=`${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}`;
+  const fname=siteName?`목공가견적_${siteName}_${dateStr}.xlsx`:`목공가견적_${dateStr}.xlsx`;
+  XLSX.writeFile(wb,fname);
+}
+
+function recalcLaborArea(){
+  // 벽체+천장 시공면적 재계산해서 표시
+  let autoTotal=0;
+  const detailParts=[];
+  wallList.forEach((w,i)=>{
+    const lbl=w.is1p?'1P÷2':w.is4p?'가벽×2':'2P';
+    detailParts.push('벽체#'+(i+1)+'('+lbl+') '+Math.round(w.constrSqm)+'㎡');
+    autoTotal+=w.constrSqm;
+  });
+  if(ceilSqm>0){
+    const cs=gbPly===2?Math.ceil(ceilSqm)*2:Math.ceil(Math.ceil(ceilSqm)/2);
+    const clbl=gbPly===2?'×2':'÷2';
+    detailParts.push('천장('+clbl+') '+cs+'㎡');
+    autoTotal+=cs;
+  }
+  const elDetail=document.getElementById('labor_area_detail');
+  if(elDetail)elDetail.textContent=detailParts.length>0?detailParts.join(' + '):'벽체·천장 탭에서 먼저 계산해주세요';
+  const autoRounded=Math.round(autoTotal);
+  // 직접입력 없으면 자동값으로 업데이트
+  document.getElementById('labor_area').value=autoRounded;
+  set('labor_area_disp',autoRounded>0?autoRounded+' ㎡':'—');
+  calcLabor();
+}
+
+function recalcAll(){
+  calcCost();
+  calcLabor();
+  updateGrandTotal();
+}
+
+function calcLabor(){
+  const chiefToggle=document.getElementById('chief_toggle');
+  const chiefOn=chiefToggle?chiefToggle.checked:true;
+  const chiefRate=parseFloat(document.getElementById('chief_rate').value)||0;
+  const assistOn=document.getElementById('assist_toggle').checked;
+  const assistRate=parseFloat(document.getElementById('assist_rate').value)||0;
+  const doorOn=document.getElementById('door_toggle').checked;
+  const doorRate=parseFloat(document.getElementById('door_rate').value)||0;
+  // 시공면적 상세: 벽체 각각 + 천장 자동합산
+  const detailParts=[];
+  let autoTotal=0;
+  wallList.forEach((w,i)=>{
+    const lbl=w.is1p?'1P÷2':w.is4p?'가벽×2':'2P';
+    detailParts.push('벽체#'+(i+1)+'('+lbl+') '+Math.round(w.constrSqm)+'㎡');
+    autoTotal+=w.constrSqm;
+  });
+  if(ceilSqm>0){
+    const cs=gbPly===2?ceilSqm*2:ceilSqm/2;
+    const clbl=gbPly===2?'×2':'÷2';
+    detailParts.push('천장('+clbl+') '+Math.round(cs)+'㎡');
+    autoTotal+=cs;
+  }
+  const elDetail=document.getElementById('labor_area_detail');
+  if(elDetail)elDetail.textContent=detailParts.length>0?detailParts.join(' + '):'벽체·천장 탭에서 먼저 계산해주세요';
+  // 자동합계 or 직접입력으로 면적 결정
+  const autoRounded=Math.round(autoTotal);
+  const area=(parseFloat(document.getElementById('labor_area').value)||0)||autoRounded;
+  set('labor_area_disp',area>0?area+' ㎡':'—');
+  document.getElementById('assist_inp').style.display=assistOn?'flex':'none';
+
+  document.getElementById('res_assist_row').style.display=assistOn?'flex':'none';
+  document.getElementById('door_inp').style.display=doorOn?'block':'none';
+  document.getElementById('door_sub').textContent=doorOn?'포함됨':'제외됨';
+  document.getElementById('res_door_row').style.display=doorOn?'flex':'none';
+  const base=getBaseDays(area);
+  if(base!==null&&base!==baseDays){baseDays=base;adjDays=0;}
+  const totalDays=Math.max(1,baseDays+adjDays);
+  highlightRange(area);
+  const adjLabel=adjDays===0?'면적 기준':adjDays>0?'기준 +'+adjDays+'일':'기준 '+adjDays+'일';
+  set('base_day_lbl',adjLabel);set('day_disp',totalDays);set('res_days',totalDays+' 일');
+  const chiefTotal=chiefOn?chiefRate*totalDays:0,assistTotal=assistOn?assistRate*totalDays:0;
+  set('res_chief',fmt(chiefTotal)+' 원');set('res_chief_hint',fmt(chiefRate)+' × '+totalDays+'일');
+  if(assistOn){set('res_assist',fmt(assistTotal)+' 원');set('res_assist_hint',fmt(assistRate)+' × '+totalDays+'일');}
+  let doorLaborTotal=0;
+  if(doorOn&&doorLaborCnt>0){
+    const sets=Math.ceil(doorLaborCnt/2);
+    doorLaborTotal=sets*doorRate;
+    set('door_labor_cnt',doorLaborCnt);
+    set('door_labor_cnt_disp',doorLaborCnt);
+    set('door_labor_total',fmt(doorLaborTotal)+' 원');
+    set('res_door',fmt(doorLaborTotal)+' 원');
+  } else if(doorOn){
+    set('door_labor_total','0 원');
+    set('door_labor_cnt_disp',doorLaborCnt);
+  }
+  const grandTotal=chiefTotal+assistTotal+doorLaborTotal;
+  set('labor_total',fmt(grandTotal)+' 원');
+  const parts=[];
+  if(chiefTotal>0)parts.push('대장 '+fmt(chiefTotal));
+  if(assistTotal>0)parts.push('보조 '+fmt(assistTotal));
+  if(doorLaborTotal>0)parts.push('문설치 '+fmt(doorLaborTotal));
+  set('labor_hint',parts.length>0?parts.join(' + ')+'  ('+totalDays+'일 기준)':'면적과 일당을 입력하면 자동 계산됩니다');
+  updateGrandTotal();
+}
+
+calcWall();calcCeiling();
+</script>
+</body>
+</html>
