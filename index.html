@@ -463,10 +463,7 @@ input:checked+.toggle-slider::before{transform:translateX(20px)}
     </div>
   </div>
 
-  <!-- 3. 목공 자재비 합계 -->
-  <div class="cost-box cb-mat"><div class="cb-lbl cb-lbl-mat">목공 자재비 합계</div><div class="cb-val cb-val-mat" id="cost_total">0 원</div><div class="cb-hint" id="cost_breakdown">단가를 입력하면 자동 계산됩니다</div></div>
-
-  <!-- 4. 문 설치 자재비 -->
+  <!-- 3-1. 문 설치 자재비 -->
   <div class="cost-box cb-door" style="background:rgba(200,160,74,.06);border:1px solid rgba(200,160,74,.5)">
     <div class="cb-lbl cb-lbl-door">문 설치 자재비</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px">
@@ -482,6 +479,9 @@ input:checked+.toggle-slider::before{transform:translateX(20px)}
     </div>
     <div class="cb-hint" id="door_mat_hint">문 수량을 추가하면 자동 계산됩니다</div>
   </div>
+
+  <!-- 3-2. 목공 자재비 합계 -->
+  <div class="cost-box cb-mat"><div class="cb-lbl cb-lbl-mat">목공 자재비 합계</div><div class="cb-val cb-val-mat" id="cost_total">0 원</div><div class="cb-hint" id="cost_breakdown">단가를 입력하면 자동 계산됩니다</div></div>
 
   <!-- 5. 목공 부자재비 -->
   <div class="cost-box cb-sub"><div class="cb-lbl cb-lbl-sub">목공 부자재비 합계<span style="font-size:10px;font-weight:400;margin-left:8px;opacity:.7">천장면적 기준 · 평당 15,000원</span></div><div class="cb-val cb-val-sub" id="sub_cost_total">0 원</div><div class="cb-hint" id="sub_cost_hint">천장 면적을 먼저 입력하세요</div></div>
